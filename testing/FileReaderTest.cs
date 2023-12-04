@@ -47,5 +47,70 @@ public class FileReaderTest
         
         Assert.Equal(readerTest.Words, expected);
     }
+    
+    [Fact]
+    public void StringToWords_ReturnsCorrectArrayOfWordsWithHyphenedWords()
+    {
+        var readerTest = new FileReader();
+
+        string input = "This is a hyphened-test!";
+
+        var expected = new List<string> { "this", "is", "a", "hyphened-test" };
+        
+        readerTest.StringToWords(input);
+        
+        Assert.Equal(readerTest.Words, expected);
+    }
+    
+    [Fact]
+    public void StringToWords_ReturnsCorrectArrayOfWordsWithRandomHyphens()
+    {
+        var readerTest = new FileReader();
+
+        string input = "This is a ---hyphened-test----";
+
+        var expected = new List<string> { "this", "is", "a", "hyphened-test" };
+        
+        readerTest.StringToWords(input);
+        
+        Assert.Equal(readerTest.Words, expected);
+    }
+
+    [Fact]
+    public void StringToWords_ReturnsCorrectArrayOfWordsWithMultipleLines()
+    
+    {
+        var readerTest = new FileReader();
+
+        string input =  @"
+                        This
+                        is
+                        a
+                        test";
+
+        var expected = new List<string> { "this", "is", "a", "test" };
+        
+        readerTest.StringToWords(input);
+        
+        Assert.Equal(readerTest.Words, expected);
+    }
+    
+    [Fact]
+    public void StringToWords_ReturnsCorrectArrayOfWordsWithMultipleSpaces()
+    
+    {
+        var readerTest = new FileReader();
+
+        string input = "This       is     a       test";
+
+        var expected = new List<string> { "this", "is", "a", "test" };
+        
+        readerTest.StringToWords(input);
+        
+        Assert.Equal(readerTest.Words, expected);
+    }
+    
+    
+    
 
 }
