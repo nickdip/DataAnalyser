@@ -1,5 +1,5 @@
-#Tech stacks: C#
+Tech stacks: C#
 
-#Testing: xUnit
+Testing: xUnit
 
-#Work in Progress!
+Work in Progress!
