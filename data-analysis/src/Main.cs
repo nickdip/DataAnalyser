@@ -35,42 +35,33 @@ public class Program
 
         reader.StringToWords(data);
 
-        reader.DisplayWords();
+        List<string> wordList = reader.Words;
         
         Stopwatch stopwatch = new Stopwatch();
-        
-        var rand = new Random();
-
-        List<string> words = new List<string>{};
-        
-        for (int ctr = 0; ctr <= 10000000; ctr++)
-        {
-            words.Add(rand.Next().ToString());
-        }
 
         stopwatch.Start();
-        
-        MultiThreadingProcessor test = new MultiThreadingProcessor(words);
+
+        float mean;
+
+        if (Multithreading)
+        {
+            MultiThreadingProcessor test = new MultiThreadingProcessor(wordList);
+            mean = test.Mean();
+        }
+        else
+        {
+            SingleThreadProcessor test = new SingleThreadProcessor();
+            mean = test.GetMean(wordList);
+
+        }
         
         stopwatch.Stop();
         
-        Console.WriteLine($"Time elapsed (threading): {stopwatch.Elapsed}");
-
-        int sum = 0; 
+        Console.WriteLine($"Time elapsed: {stopwatch.Elapsed}");
         
-        stopwatch.Start();
-        
-        foreach (string word in words)
-        {
-            sum += word.Length;
-        }
-        
-        Console.WriteLine($"Mean: { (float) sum / words.Count}");
+        Console.WriteLine($"Mean: {mean}");
         
         stopwatch.Stop();
-        
-        Console.WriteLine($"Time elapsed (not-threading): {stopwatch.Elapsed}");
-        
         
     }
 

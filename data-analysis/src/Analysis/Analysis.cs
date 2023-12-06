@@ -31,14 +31,8 @@ public class MultiThreadingProcessor
         
         _doneEvent.WaitOne();
         
-        Console.WriteLine($"Mean: {_wordCount / _totalLength}");
     }
     
-
-    private static void WordProcess(object word)
-    {
-        Increment(word);
-    }
     
     private static void ProcessSublist(List<string> sublist)
     {
@@ -47,8 +41,7 @@ public class MultiThreadingProcessor
         _wordCount += batch.Sum;
         
         _totalLength += batch.Count;
-    
-        // Assuming _completedTasks is incremented after each word is processed
+
         lock (LockObj)
         {
             _completedTasks += sublist.Count;
@@ -60,30 +53,23 @@ public class MultiThreadingProcessor
         }
     }
     
-    
-    private static void Increment(object state)
-    {
-        string word = (string) state;
-        int length = word.Length;
-        
-        lock (LockObj)
-        {
-            _totalLength += length;
-            _wordCount++;
-            _completedTasks++;
 
-            if (_completedTasks == _wordCount)
-            {
-                _doneEvent.Set();
-            }
-        }
-    }
-
-    private static float Mean()
+    public float Mean()
     {
         return (float)_totalLength / _wordCount;
     }
     
+    
+}
+
+public class SingleThreadProcessor()
+{
+    public float GetMean(List<string> words)
+    {
+        BatchProcess batch = new BatchProcess(words);
+
+        return batch.Count / batch.Sum;
+    }
     
 }
 
