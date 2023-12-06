@@ -1,17 +1,17 @@
 using dataanalysis;
 
-public class AnalysisTest
+public class SingleThreadTest
 {
     [Fact]
     public void AvgWordLength_ReturnsTheWordLengthForOneWord()
     {
         List<string> testWords = new List<string> { "Test" };
         
-        var analysisTest =  new Analysis(testWords);
+        var analysisTest =  new SingleThreadProcessor(testWords);
 
         var expected = 4;
 
-        var output = analysisTest.AvgWordCount;
+        var output = analysisTest.GetMean();
         
         Assert.Equal(expected, output);
     }
@@ -21,11 +21,11 @@ public class AnalysisTest
     {
         List<string> testWords = new List<string> { "This", "is", "a", "test" };
         
-        var analysisTest =  new Analysis(testWords);
+        var analysisTest =  new SingleThreadProcessor(testWords);
 
         var expected = ("This".Length + "is".Length + "a".Length + "test".Length) / (float) 4;
 
-        var output = analysisTest.AvgWordCount;
+        var output = analysisTest.GetMean();
         
         Assert.Equal(expected, output);
     }
