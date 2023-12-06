@@ -265,62 +265,31 @@ public class BatchProcess
         }
     }
     
-    public float Mean(List<string> words)
-    {
-        return Sum / Count; 
-    }
 }
 
-// public class Count : WordProcessor
+// public class Analysis : WordProcessor
 // {
-//     
-//     public void Increment(object state)
+//     public float AvgWordCount { get; private set; }
+//
+//     public Analysis(List<string> providedWords) : base(providedWords)
 //     {
-//         string word = (string) state;
-//         int length = word.Length;
+//         AvgWordCount = AvgWordLength();
+//     }
+//
+//     private float AvgWordLength()
+//     {
+//         if (Words.Count == 0) return 0;
+//             
+//         float sum = 0;
 //         
-//         lock (LockObj)
+//         foreach (string word in Words)
 //         {
-//             _totalLength += length;
-//             _wordCount++;
-//             _completedTasks++;
-//
-//             if (_completedTasks == _wordCount)
-//             {
-//                 doneEvent.Set();
-//             }
+//             sum += word.Length;
 //         }
-//     }
 //
-//     public float Mean()
-//     {
-//         return (float)_totalLength / _wordCount;
+//         return sum / Words.Count; 
 //     }
+//     
+//     
+//     
 // }
-
-public class Analysis : WordProcessor
-{
-    public float AvgWordCount { get; private set; }
-
-    public Analysis(List<string> providedWords) : base(providedWords)
-    {
-        AvgWordCount = AvgWordLength();
-    }
-
-    private float AvgWordLength()
-    {
-        if (Words.Count == 0) return 0;
-            
-        float sum = 0;
-        
-        foreach (string word in Words)
-        {
-            sum += word.Length;
-        }
-
-        return sum / Words.Count; 
-    }
-    
-    
-    
-}
