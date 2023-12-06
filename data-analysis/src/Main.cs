@@ -50,8 +50,8 @@ public class Program
         }
         else
         {
-            SingleThreadProcessor test = new SingleThreadProcessor();
-            mean = test.GetMean(wordList);
+            SingleThreadProcessor test = new SingleThreadProcessor(wordList);
+            mean = test.GetMean();
 
         }
         
