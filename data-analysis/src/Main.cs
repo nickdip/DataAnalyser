@@ -5,24 +5,33 @@ using System.Reflection;
 using System.Security.Cryptography;
 
 
-namespace dataanalysis;
 
+
+namespace dataanalysis;
 public class Program
 {
+    private static string? Path { get; set; }
+    private static bool Multithreading { get; set; }
+
+    public Program()
+    {
+        Path = "";
+        Multithreading = false;
+    }
+    
     public static void Main(string[] args)
     {
-        if (args.Length == 0)
+
+        if (!HandleArguments(args))
         {
-            Console.WriteLine("No file specified");
-            Console.ReadKey();
             return;
         }
         
-        string filePath = args[0];
+        Console.WriteLine(Path);
         
         FileReader reader = new FileReader();
 
-        string data = reader.FileToString(filePath);
+        string data = reader.FileToString(Path);
 
         reader.StringToWords(data);
 
@@ -41,7 +50,7 @@ public class Program
 
         stopwatch.Start();
         
-        WordProcessor test = new WordProcessor(words);
+        MultiThreadingProcessor test = new MultiThreadingProcessor(words);
         
         stopwatch.Stop();
         
@@ -63,10 +72,63 @@ public class Program
         Console.WriteLine($"Time elapsed (not-threading): {stopwatch.Elapsed}");
         
         
-        
-        
-        
+    }
 
+    private static bool HandleArguments(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.WriteLine("No arguments specified. You must specify a path");
+            Console.ReadKey();
+            return false;
+        }
+
+        foreach (string arg in args)
+        {
+            string prefix = "path=";
+            
+            if (CheckForPath(arg, prefix))
+            {
+                Path = arg.Substring(prefix.Length);
+            }
+
+            prefix = "multithreading=";
+            
+            if (CheckForPath(arg, prefix))
+            {
+                if (!Boolean.TryParse(arg.Substring(prefix.Length), out bool result))
+                {
+                    Console.WriteLine("multithreading must equal to equal true or false.");
+                    return false;
+                }
+
+                Multithreading = result;
+            }
+        }
+
+        if (Path == null)
+        {
+            Console.WriteLine("You must specify a path");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool CheckForPath(string argument, string prefix)
+    {
+        if (argument.Substring(0, prefix.Length).ToLower() != prefix)
+        {
+            return false;
+        }
+        return true;
+
+    }
+    
+
+    private static bool MultiThreading(string parsedArguments)
+    {
+        return false;
     }
     
 
@@ -162,134 +224,3 @@ public class FileReader : IFileReader
     
 
 }
-
-public class WordProcessor
-{
-    public static List<string> Words { get; set; }
-    private static readonly ManualResetEvent _doneEvent = new ManualResetEvent(false);
-    private static float _totalLength = 0;
-    private static int _completedTasks = 0;
-    private static int _wordCount = 0;
-    private static readonly object LockObj = new object();
-
-    public WordProcessor(List<string> providedWords)
-    {
-        Words = providedWords; 
-        ThreadPool.SetMaxThreads(Environment.ProcessorCount, Environment.ProcessorCount);
-        
-        int sublistSize = 10000; 
-        int totalWords = Words.Count;
-        int startIndex = 0;
-
-        while (startIndex < totalWords)
-        {
-            int count = Math.Min(sublistSize, totalWords - startIndex);
-            List<string> sublist = Words.GetRange(startIndex, count);
-            ThreadPool.QueueUserWorkItem(state => ProcessSublist(sublist));
-
-            startIndex += sublistSize;
-        }
-        
-        
-        _doneEvent.WaitOne();
-        
-        Console.WriteLine($"Mean: {_wordCount / _totalLength}");
-    }
-    
-
-    private static void WordProcess(object word)
-    {
-        Increment(word);
-    }
-    
-    private static void ProcessSublist(List<string> sublist)
-    {
-        BatchProcess batch = new BatchProcess(sublist);
-        
-        _wordCount += batch.Sum;
-        
-        _totalLength += batch.Count;
-    
-        // Assuming _completedTasks is incremented after each word is processed
-        lock (LockObj)
-        {
-            _completedTasks += sublist.Count;
-
-            if (_completedTasks == Words.Count)
-            {
-                _doneEvent.Set();
-            }
-        }
-    }
-    
-    
-    private static void Increment(object state)
-    {
-        string word = (string) state;
-        int length = word.Length;
-        
-        lock (LockObj)
-        {
-            _totalLength += length;
-            _wordCount++;
-            _completedTasks++;
-
-            if (_completedTasks == _wordCount)
-            {
-                _doneEvent.Set();
-            }
-        }
-    }
-
-    private static float Mean()
-    {
-        return (float)_totalLength / _wordCount;
-    }
-    
-    
-}
-
-public class BatchProcess
-{
-    public float Count { get; set; }
-    public int Sum { get; set; }
-
-    public BatchProcess(List<string> words)
-    {
-        Count = 0;
-        Sum = 0;
-        foreach (string word in words)
-        {
-            Sum += word.Length;
-            Count++;
-        }
-    }
-    
-}
-
-// public class Analysis : WordProcessor
-// {
-//     public float AvgWordCount { get; private set; }
-//
-//     public Analysis(List<string> providedWords) : base(providedWords)
-//     {
-//         AvgWordCount = AvgWordLength();
-//     }
-//
-//     private float AvgWordLength()
-//     {
-//         if (Words.Count == 0) return 0;
-//             
-//         float sum = 0;
-//         
-//         foreach (string word in Words)
-//         {
-//             sum += word.Length;
-//         }
-//
-//         return sum / Words.Count; 
-//     }
-//     
-//     
-//     
-// }
